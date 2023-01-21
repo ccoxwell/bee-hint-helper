@@ -1,21 +1,15 @@
 <template>
   <h1>Hints</h1>
   <h2>Live Grid</h2>
-  <ul>
-    <li v-for="item in theLiveGrid">
-      <ul>
-        <li v-for="obj in item">{{ obj }}</li>
-      </ul>
-    </li>
-  </ul>
-  <h2>Complete Grid</h2>
-  <ul>
-    <li v-for="item in theCompleteGrid">
-      <ul>
-        <li v-for="obj in item">{{ obj }}</li>
-      </ul>
-    </li>
-  </ul>
+  <table>
+    <tr>
+      <th v-for="header in theLiveGridObject.headers">{{ header }}</th>
+    </tr>
+    <tr v-for="row in theLiveGridObject.matrix">
+      <td v-for="entry in row">{{ entry }}</td>
+    </tr>
+  </table>
+  <h2>Found Words</h2>
   <pre>
     {{ foundWords }}
   </pre>
@@ -48,8 +42,32 @@ const theCompleteGrid = computed(() => {
   } else return []
 });
 
-const theLiveGrid = computed(() => {
-  return theCompleteGrid.value
+const theLiveGridObject = computed(() => {
+  if (Object.keys(props.foundWords).length < 1) {
+    return "no found words"
+  }
+  const aggregatedGrid = theCompleteGrid.value.flat().reduce((aggregate, current) => {
+    const { firstLetter, wordLength, count } = current
+    const foundWordLengthCount = props.foundWords?.[firstLetter]?.[wordLength]?.count ?? 0
+    if (aggregate[firstLetter] == null) {
+      aggregate[firstLetter] = { [wordLength]: { count: count - foundWordLengthCount } }
+    } else {
+      aggregate[firstLetter][wordLength] = { count: count - foundWordLengthCount }
+    }
+    return aggregate
+  }, {})
+  const rowHeaders = Object.keys(aggregatedGrid)
+  const columnHeaders = Object.keys(aggregatedGrid[rowHeaders[0]])
+  let countMatrix = []
+  for (const header of rowHeaders) {
+    const letterObject = aggregatedGrid[header]
+    let counts = []
+    for (const lengthProperty in letterObject) {
+      counts.push(letterObject[lengthProperty].count || "-")
+    }
+    countMatrix.push([header, ...counts])
+  }
+  return { headers: ['', ...columnHeaders], matrix: countMatrix }
 })
 
 /*
@@ -134,5 +152,27 @@ const theLiveGrid = computed(() => {
 </script>
 
 <style scoped>
+body {
+  font-size: 16px;
+}
 
+table {
+  text-align: left;
+  border-collapse: collapse;
+  text-transform: capitalize;
+}
+
+tr:nth-child(even) {
+  background-color: lightgray;
+}
+
+th,
+tr>td:first-child {
+  font-weight: bold;
+}
+
+td {
+  padding: 3px;
+  width: 3rem;
+}
 </style>
