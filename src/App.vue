@@ -1,6 +1,7 @@
 <template>
   <main>
-    <TheHints :grid="gridList" :two-letter="twoLetterList" :found-words="currentWordGridAggregate">
+    <TheHints :grid="gridList" :two-letter="twoLetterList" :found-words-grid="currentWordGridAggregate"
+      :found-words-two-letter="currentWordTwoLetterAggregate">
     </TheHints>
     <FoundWords :current-words="currentWords"></FoundWords>
   </main>
@@ -32,6 +33,21 @@ const currentWordGridAggregate = computed(() => {
       aggregate[firstLetter][wordLength] = { count: 1 }
     } else {
       aggregate[firstLetter][wordLength].count++
+    }
+    return aggregate
+  }, {})
+})
+
+const currentWordTwoLetterAggregate = computed(() => {
+  return currentWordObjectList.value.reduce((aggregate, key) => {
+    const { twoLetter, firstLetter } = key
+    if (aggregate[firstLetter] == null) {
+      aggregate[firstLetter] = { [twoLetter]: 1 }
+    }
+    else if (aggregate[firstLetter][twoLetter] == null) {
+      aggregate[firstLetter][twoLetter] = 1
+    } else {
+      aggregate[firstLetter][twoLetter]++
     }
     return aggregate
   }, {})

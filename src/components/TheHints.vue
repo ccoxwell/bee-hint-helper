@@ -9,6 +9,9 @@
       <td v-for="entry in row" :data-in-bee="entry.actuallyInBee" :data-count-value="entry.val">{{ entry.display }}</td>
     </tr>
   </table>
+  <pre>
+    {{ theLiveTwoLetterObject }}
+  </pre>
 </template>
 
 <script setup>
@@ -17,8 +20,36 @@ const props = defineProps(
   {
     grid: Array,
     twoLetter: Array,
-    foundWords: Object
-  });
+    foundWordsGrid: Object,
+    foundWordsTwoLetter: Object
+  }
+);
+
+const theCompleteTwoLetter = computed(() => {
+  if (props.twoLetter.length > 0) {
+    return props.twoLetter.map(row => {
+      const firstLetter = row[0]
+      const twoLetterObjectList = row.split(" ").map(item => {
+        const itemArray = item.split("-")
+        return { twoLettervalue: itemArray[0], count: Number(itemArray[1]) }
+      })
+      return { [firstLetter]: twoLetterObjectList }
+    })
+  } else {
+    return []
+  }
+})
+
+const theLiveTwoLetterObject = computed(() => {
+
+
+  // {
+  //   const remainingTwoLetter = props.foundWordsTwoLetter.reduce((aggregate, current) => {
+  //     aggregate[]
+  //   }, {})
+  // }
+  return theCompleteTwoLetter.value
+})
 
 
 const theCompleteGrid = computed(() => {
@@ -26,7 +57,6 @@ const theCompleteGrid = computed(() => {
     let [gridHeading, ...gridData] = props.grid
     gridHeading = gridHeading.split(",").slice(1, -1)
     const finalGridData = gridData.slice(0, -1).map(row => {
-
       let rowList = row.split(",").slice(0, -1)
       let [rowHeading, ...rowData] = rowList
       const firstLetter = rowHeading.slice(0, 1)
@@ -52,13 +82,13 @@ const theCompleteGrid = computed(() => {
 });
 
 const theLiveGridObject = computed(() => {
-  if (Object.keys(props.foundWords).length < 1) {
+  if (Object.keys(props.foundWordsGrid).length < 1) {
     return "no found words"
   }
   const aggregatedGrid = theCompleteGrid.value.flat().reduce((aggregate, current) => {
     const { firstLetter, wordLength, count } = current
     const { actuallyInBee } = count
-    const foundWordLengthCount = props.foundWords?.[firstLetter]?.[wordLength]?.count ?? 0
+    const foundWordLengthCount = props.foundWordsGrid?.[firstLetter]?.[wordLength]?.count ?? 0
     let remaining, display
     if (actuallyInBee) {
       remaining, display = count.val - foundWordLengthCount
@@ -88,7 +118,7 @@ const theLiveGridObject = computed(() => {
     headers: ['', ...columnHeaders],
     matrix: countMatrix
   }
-})
+});
 </script>
 
 <style scoped>
