@@ -6,13 +6,9 @@
       <th v-for="header in theLiveGridObject.headers">{{ header }}</th>
     </tr>
     <tr v-for="row in theLiveGridObject.matrix">
-      <td v-for="entry in row">{{ entry }}</td>
+      <td v-for="entry in row" :data-in-bee="entry.actuallyInBee" :data-count-value="entry.val">{{ entry.display }}</td>
     </tr>
   </table>
-  <h2>Found Words</h2>
-  <pre>
-    {{ foundWords }}
-  </pre>
 </template>
 
 <script setup>
@@ -28,17 +24,30 @@ const props = defineProps(
 const theCompleteGrid = computed(() => {
   if (props.grid.length > 0) {
     let [gridHeading, ...gridData] = props.grid
-    gridHeading = gridHeading.split(",").slice(1)
-    return gridData.map(row => {
-      let rowList = row.replaceAll("-", "0").split(",")
+    gridHeading = gridHeading.split(",").slice(1, -1)
+    const finalGridData = gridData.slice(0, -1).map(row => {
+
+      let rowList = row.split(",").slice(0, -1)
       let [rowHeading, ...rowData] = rowList
       const firstLetter = rowHeading.slice(0, 1)
-      return rowData.map((item, i) => ({
-        wordLength: gridHeading?.[i],
-        firstLetter,
-        count: Number(item),
-      }))
+      return rowData.map((item, i) => {
+        if (item === "-") {
+          var count = { val: 0, display: "-", actuallyInBee: false }
+        } else {
+          var count = {
+            actuallyInBee: true,
+            display: Number(item),
+            val: Number(item)
+          }
+        }
+        return {
+          wordLength: gridHeading?.[i],
+          firstLetter,
+          count
+        }
+      })
     })
+    return finalGridData
   } else return []
 });
 
@@ -48,11 +57,19 @@ const theLiveGridObject = computed(() => {
   }
   const aggregatedGrid = theCompleteGrid.value.flat().reduce((aggregate, current) => {
     const { firstLetter, wordLength, count } = current
+    const { actuallyInBee } = count
     const foundWordLengthCount = props.foundWords?.[firstLetter]?.[wordLength]?.count ?? 0
-    if (aggregate[firstLetter] == null) {
-      aggregate[firstLetter] = { [wordLength]: { count: count - foundWordLengthCount } }
+    let remaining, display
+    if (actuallyInBee) {
+      remaining, display = count.val - foundWordLengthCount
     } else {
-      aggregate[firstLetter][wordLength] = { count: count - foundWordLengthCount }
+      remaining = 0
+      display = "-"
+    }
+    if (aggregate[firstLetter] == null) {
+      aggregate[firstLetter] = { [wordLength]: { actuallyInBee, display, val: remaining } }
+    } else {
+      aggregate[firstLetter][wordLength] = { actuallyInBee, display, val: remaining }
     }
     return aggregate
   }, {})
@@ -63,92 +80,15 @@ const theLiveGridObject = computed(() => {
     const letterObject = aggregatedGrid[header]
     let counts = []
     for (const lengthProperty in letterObject) {
-      counts.push(letterObject[lengthProperty].count || "-")
+      counts.push(letterObject[lengthProperty])
     }
-    countMatrix.push([header, ...counts])
+    countMatrix.push([{ display: header }, ...counts])
   }
-  return { headers: ['', ...columnHeaders], matrix: countMatrix }
+  return {
+    headers: ['', ...columnHeaders],
+    matrix: countMatrix
+  }
 })
-
-/*
-{
-  "gridHeading": " ,4,5,6,7,8,9,Σ",
-  "rows": [
-    {
-      "rowHeading": "a:",
-      "rowData": [
-        "0",
-        "1",
-        "0",
-        "0",
-        "0",
-        "0",
-        "1"
-      ]
-    },
-    {
-      "rowHeading": "b:",
-      "rowData": [
-        "9",
-        "2",
-        "1",
-        "1",
-        "1",
-        "0",
-        "14"
-      ]
-    },
-    {
-      "rowHeading": "l:",
-      "rowData": [
-        "0",
-        "1",
-        "1",
-        "0",
-        "0",
-        "0",
-        "2"
-      ]
-    },
-    {
-      "rowHeading": "p:",
-      "rowData": [
-        "0",
-        "0",
-        "0",
-        "1",
-        "0",
-        "1",
-        "2"
-      ]
-    },
-    {
-      "rowHeading": "t:",
-      "rowData": [
-        "0",
-        "2",
-        "1",
-        "0",
-        "0",
-        "0",
-        "3"
-      ]
-    },
-    {
-      "rowHeading": "Σ:",
-      "rowData": [
-        "9",
-        "6",
-        "3",
-        "2",
-        "1",
-        "1",
-        "22"
-      ]
-    }
-  ]
-}
-*/
 </script>
 
 <style scoped>
@@ -163,7 +103,7 @@ table {
 }
 
 tr:nth-child(even) {
-  background-color: lightgray;
+  background-color: #DDD;
 }
 
 th,
@@ -174,5 +114,9 @@ tr>td:first-child {
 td {
   padding: 3px;
   width: 3rem;
+}
+
+td[data-in-bee='false'] {
+  color: #aaa;
 }
 </style>

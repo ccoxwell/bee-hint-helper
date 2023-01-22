@@ -47,6 +47,7 @@ async function fetchHints() {
 async function fetchCurrentWords() {
   const currentWordsResponse = await fetch('http://localhost:3001/current-words')
   const currentWordsArray = await currentWordsResponse.json()
+  console.log(currentWordsArray)
   currentWords.value = currentWordsArray.foundWords
 }
 
