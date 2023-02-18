@@ -3,19 +3,21 @@
   <h2>Live Grid</h2>
   <table>
     <tr>
-      <th v-for="header in theLiveGridObject.headers">{{ header }}</th>
+      <th class="text-left" v-for="header in theLiveGridObject.headers">{{ header }}</th>
     </tr>
     <tr v-for="row in theLiveGridObject.matrix">
       <td v-for="entry in row" :data-in-bee="entry.actuallyInBee" :data-count-value="entry.val">{{ entry.display }}</td>
     </tr>
   </table>
-  <pre>
-    {{ theLiveTwoLetterObject }}
-  </pre>
+  <h2>Live Two Letter</h2>
+  <ul>
+    <li v-for="entry in theLiveTwoLetterObject">{{ entry }}</li>
+  </ul>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import 'core-js/features/array/group.js'
 const props = defineProps(
   {
     grid: Array,
@@ -27,28 +29,24 @@ const props = defineProps(
 
 const theCompleteTwoLetter = computed(() => {
   if (props.twoLetter.length > 0) {
-    return props.twoLetter.map(row => {
-      const firstLetter = row[0]
-      const twoLetterObjectList = row.split(" ").map(item => {
-        const itemArray = item.split("-")
-        return { twoLettervalue: itemArray[0], count: Number(itemArray[1]) }
-      })
-      return { [firstLetter]: twoLetterObjectList }
-    })
+    return props.twoLetter.map(row => row.split(" ")).flat().reduce((aggregate, current) => {
+      const [twoLetter, count] = current.split('-')
+      aggregate[twoLetter] = Number(count)
+      return aggregate
+    }, {})
   } else {
     return []
   }
 })
 
 const theLiveTwoLetterObject = computed(() => {
-
-
-  // {
-  //   const remainingTwoLetter = props.foundWordsTwoLetter.reduce((aggregate, current) => {
-  //     aggregate[]
-  //   }, {})
-  // }
-  return theCompleteTwoLetter.value
+  const liveTwoLetterObject = { ...theCompleteTwoLetter.value }
+  let finalArray = []
+  for (const prop in props.foundWordsTwoLetter) {
+    liveTwoLetterObject[prop] = liveTwoLetterObject[prop] - props.foundWordsTwoLetter[prop]
+    finalArray.push(`${prop}: ${liveTwoLetterObject[prop]}`)
+  }
+  return finalArray
 })
 
 

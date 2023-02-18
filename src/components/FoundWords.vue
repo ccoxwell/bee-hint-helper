@@ -1,7 +1,7 @@
 <template>
 
     <ul>
-        <li v-for="word in currentWords">
+        <li v-for="word in foundWords">
             {{ word }}
         </li>
     </ul>
@@ -9,6 +9,6 @@
 
 <script setup>
 const props = defineProps({
-    currentWords: Array,
+    foundWords: Array,
 });
 </script>
