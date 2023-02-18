@@ -120,7 +120,7 @@ const theLiveGridObject = computed(() => {
 </script>
 
 <style scoped>
-body {
+/* body {
   font-size: 16px;
 }
 
@@ -146,5 +146,5 @@ td {
 
 td[data-in-bee='false'] {
   color: #aaa;
-}
+} */
 </style>
