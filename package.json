@@ -12,6 +12,7 @@
   "dependencies": {
     "@vitejs/plugin-legacy": "^3.0.2",
     "core-js": "^3.27.2",
+    "vite-plugin-vuetify": "^1.0.2",
     "vue": "^3.2.45"
   },
   "devDependencies": {
@@ -22,6 +23,7 @@
     "eslint": "^8.22.0",
     "eslint-plugin-vue": "^9.3.0",
     "jsdom": "^20.0.3",
+    "@mdi/font": "^7.1.96",
     "prettier": "^2.7.1",
     "vite": "^4.0.0",
     "vitest": "^0.25.6"

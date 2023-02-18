@@ -1,10 +1,20 @@
 <template>
-  <main>
-    <TheHints :grid="gridList" :two-letter="twoLetterList" :found-words-grid="foundWordGridAggregate"
-      :found-words-two-letter="foundWordTwoLetterAggregate">
-    </TheHints>
-    <!-- <FoundWords :found-words="foundWords"></FoundWords> -->
-  </main>
+  <v-app>
+    <v-app-bar>
+      <v-app-bar-nav-icon>
+
+      </v-app-bar-nav-icon>
+      <v-app-bar-title text="Bee Helper"></v-app-bar-title>
+    </v-app-bar>
+    <v-main>
+      <v-container>
+        <TheHints :grid="gridList" :two-letter="twoLetterList" :found-words-grid="foundWordGridAggregate"
+          :found-words-two-letter="foundWordTwoLetterAggregate">
+        </TheHints>
+        <!-- <FoundWords :found-words="foundWords"></FoundWords> -->
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
