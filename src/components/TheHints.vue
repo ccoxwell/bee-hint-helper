@@ -1,18 +1,46 @@
 <template>
   <h1>Hints</h1>
-  <h2>Live Grid</h2>
-  <table>
-    <tr>
-      <th class="text-left" v-for="header in theLiveGridObject.headers">{{ header }}</th>
-    </tr>
-    <tr v-for="row in theLiveGridObject.matrix">
-      <td v-for="entry in row" :data-in-bee="entry.actuallyInBee" :data-count-value="entry.val">{{ entry.display }}</td>
-    </tr>
-  </table>
-  <h2>Live Two Letter</h2>
-  <ul>
-    <li v-for="entry in theLiveTwoLetterObject">{{ entry }}</li>
-  </ul>
+  <v-container>
+    <v-row>
+      <v-col cols="12" sm="6">
+        <v-expansion-panels>
+          <v-expansion-panel title="Live Grid" class="bg-surface">
+            <v-expansion-panel-text>
+              <v-table density="compact">
+                <thead>
+                  <tr>
+                    <th v-for="header in theLiveGridObject.headers">{{ header }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="row in theLiveGridObject.matrix">
+                    <td v-for="entry in row" :data-in-bee="entry.actuallyInBee" :data-count-value="entry.val"
+                      class="text-uppercase">
+                      {{ entry.display }}
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-col>
+      <v-col>
+        <v-expansion-panels>
+          <v-expansion-panel title="Live Two-Letter" class="bg-surface">
+            <v-expansion-panel-text>
+              <v-list density="compact">
+                <v-list-item v-for="obj in theLiveTwoLetterObject" class="text-uppercase">
+                  {{ obj }}
+                </v-list-item>
+              </v-list>
+
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup>
@@ -119,32 +147,4 @@ const theLiveGridObject = computed(() => {
 });
 </script>
 
-<style scoped>
-/* body {
-  font-size: 16px;
-}
-
-table {
-  text-align: left;
-  border-collapse: collapse;
-  text-transform: capitalize;
-}
-
-tr:nth-child(even) {
-  background-color: #DDD;
-}
-
-th,
-tr>td:first-child {
-  font-weight: bold;
-}
-
-td {
-  padding: 3px;
-  width: 3rem;
-}
-
-td[data-in-bee='false'] {
-  color: #aaa;
-} */
-</style>
+<style scoped></style>
